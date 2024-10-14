@@ -66,6 +66,8 @@ abstract class AbstractServiceClient extends AbstractPackage
      */
     protected $accessToken = '';
 
+    protected $apiKeyToken = '';
+
 
     /**
      * @var \DateTime
@@ -213,7 +215,6 @@ abstract class AbstractServiceClient extends AbstractPackage
             $defaultOptions = [
                 'base_uri' => $this->getServiceUrl(),
                 'headers' => [
-                    'Authorization' => 'OAuth ' . $this->getAccessToken(),
                     'Host' => $this->getServiceDomain(),
                     'User-Agent' => $this->getUserAgent(),
                     'Accept' => '*/*',
@@ -221,6 +222,11 @@ abstract class AbstractServiceClient extends AbstractPackage
             ];
             if ($headers && is_array($headers)) {
                 $defaultOptions["headers"] += $headers;
+            }
+            if (!empty($this->getApiKeyToken())) {
+                $defaultOptions['headers']['Api-Key'] = $this->getApiKeyToken();
+            } elseif (!empty($this->getAccessToken())) {
+                $defaultOptions['headers']['Authorization'] = 'OAuth ' . $this->getAccessToken();
             }
             if ($this->getProxy()) {
                 $defaultOptions['proxy'] = $this->getProxy();
@@ -272,6 +278,26 @@ abstract class AbstractServiceClient extends AbstractPackage
     public function setAccessToken($accessToken)
     {
         $this->accessToken = $accessToken;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiKeyToken()
+    {
+        return $this->apiKeyToken;
+    }
+
+    /**
+     * @param string $apiKeyToken
+     *
+     * @return self
+     */
+    public function setApiKeyToken($apiKeyToken)
+    {
+        $this->apiKeyToken = $apiKeyToken;
 
         return $this;
     }
